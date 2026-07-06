@@ -1,0 +1,17 @@
+/* ── Pink Palette ─────────────────────────────────────────────────────────── */
+:root {
+  --nb-pink-50:  #FFF0F5;
+  --nb-pink-100: #FFD6E7;
+  --nb-pink-200: #FFB3CB;
+  --nb-pink-400: #FF69B4;
+  --nb-pink-600: #E91E8C;
+  --nb-pink-900: #7B0040;
+
+  /* Bootstrap 5 token overrides */
+  --bs-primary:          var(--nb-pink-400);
+  --bs-primary-rgb:      255, 105, 180;
+  --bs-link-color:       var(--nb-pink-600);
+  --bs-link-hover-color: var(--nb-pink-900);
+  --bs-body-bg:          #FFFAFB;
+  --bs-body-color:       #2d1a24;
+}
