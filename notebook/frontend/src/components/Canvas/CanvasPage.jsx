@@ -14,9 +14,8 @@ const MAX_ZOOM = 2.0;
 
 export default forwardRef(function CanvasPage(props, ref) {
   useImperativeHandle(ref, () => ({ handleImagePick, handleStickerPlace }));
-  const { activePageId, activeTool } = useApp();
+  const { activePageId, activeTool, zoom, setZoom, setSaveStatus } = useApp();
   const [elements, setElements]     = useState([]);
-  const [zoom, setZoom]             = useState(1);
   const [panX, setPanX]             = useState(0);
   const [panY, setPanY]             = useState(0);
   const wrapperRef  = useRef(null);
@@ -29,6 +28,7 @@ export default forwardRef(function CanvasPage(props, ref) {
 
   const handleStrokeComplete = useCallback(async (stroke) => {
     if (!activePageId) return;
+    setSaveStatus('saving');
     try {
       const el = await elementApi.createElement(activePageId, {
         elementType: 'stroke',
@@ -36,8 +36,12 @@ export default forwardRef(function CanvasPage(props, ref) {
         x: 0, y: 0,
       });
       setElements(prev => [...prev, el]);
-    } catch (e) { console.error('Failed to save stroke', e); }
-  }, [activePageId]);
+      setSaveStatus('saved');
+    } catch (e) {
+      console.error('Failed to save stroke', e);
+      setSaveStatus('error');
+    }
+  }, [activePageId, setSaveStatus]);
 
   // Image drag-and-drop (T129)
   const onDragOver = useCallback((e) => { e.preventDefault(); }, []);

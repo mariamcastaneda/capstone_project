@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 const CLAMP = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 const CANVAS_W = 4000;
@@ -12,8 +12,16 @@ export default function TextBoxElement({ element, onUpdate }) {
   const dragStart               = useRef(null);
   const divRef                  = useRef(null);
 
+  // Auto-focus the text area when the box is freshly created (empty content)
+  useEffect(() => {
+    if (!data.content) {
+      divRef.current?.focus();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onMouseDown = (e) => {
-    if (e.target === divRef.current) return; // let contentEditable handle it
+    // If the click is directly on the editable text, let the browser handle it — don't drag
+    if (e.target === divRef.current || divRef.current?.contains(e.target)) return;
     e.preventDefault();
     setDragging(true);
     dragStart.current = { mx: e.clientX, my: e.clientY, ox: pos.x, oy: pos.y };
@@ -41,7 +49,8 @@ export default function TextBoxElement({ element, onUpdate }) {
     <div onMouseDown={onMouseDown}
       style={{ position: 'absolute', left: pos.x, top: pos.y, width: size.w, minHeight: size.h,
         border: '1.5px dashed var(--nb-pink-400)', borderRadius: 4, cursor: dragging ? 'grabbing' : 'grab',
-        background: 'rgba(255,255,255,0.85)', boxSizing: 'border-box' }}>
+        background: 'rgba(255,255,255,0.85)', boxSizing: 'border-box',
+        pointerEvents: 'auto' }}>
       <div ref={divRef}
         contentEditable suppressContentEditableWarning
         onBlur={handleBlur}

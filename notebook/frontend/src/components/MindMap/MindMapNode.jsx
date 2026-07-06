@@ -2,13 +2,23 @@ import React from 'react';
 
 const SHAPE_STYLE = { rounded: 'rounded-rect', rect: 'rect', circle: 'circle', diamond: 'polygon' };
 
-export default function MindMapNode({ node, onMove, onAddChild, onRemove }) {
+export default function MindMapNode({ node, onMove, onAddChild, onRemove, zoom = 1, panX = 0, panY = 0 }) {
   const { id, label, shape, fillColor, borderColor, textColor, x, y } = node;
 
   const onMouseDown = (e) => {
     e.stopPropagation();
-    const sx = e.clientX - x, sy = e.clientY - y;
-    const onMv = (me) => onMove(id, me.clientX - sx, me.clientY - sy);
+    // Convert initial viewport position to canvas space
+    const startCanvasX = (e.clientX - panX) / zoom;
+    const startCanvasY = (e.clientY - panY) / zoom;
+    // Offset from node origin to where we grabbed
+    const offsetX = startCanvasX - x;
+    const offsetY = startCanvasY - y;
+
+    const onMv = (me) => {
+      const canvasX = (me.clientX - panX) / zoom - offsetX;
+      const canvasY = (me.clientY - panY) / zoom - offsetY;
+      onMove(id, canvasX, canvasY);
+    };
     const onUp = () => { window.removeEventListener('mousemove', onMv); window.removeEventListener('mouseup', onUp); };
     window.addEventListener('mousemove', onMv);
     window.addEventListener('mouseup', onUp);

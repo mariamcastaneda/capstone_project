@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Offcanvas, Tab, Tabs } from 'react-bootstrap';
+import { Offcanvas, Tab, Tabs, Spinner } from 'react-bootstrap';
 import { useApp, TOOLS } from '../../context/AppContext';
 import ColorPicker from './ColorPicker';
 import StrokeWidthSlider from './StrokeWidthSlider';
@@ -17,10 +17,17 @@ const TOOL_BUTTONS = [
 const FONTS = ['Arial','Georgia','Courier New','Verdana','Times New Roman',
                'Trebuchet MS','Impact','Palatino','Comic Sans MS','Indie Flower'];
 
-export default function Toolbar({ saveStatus, onImagePick, onStickerPlace }) {
-  const { activeTool, setActiveTool, eraserMode, setEraserMode } = useApp();
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 2.0;
+const ZOOM_STEP = 0.1;
+
+export default function Toolbar({ onImagePick, onStickerPlace }) {
+  const { activeTool, setActiveTool, eraserMode, setEraserMode, zoom, setZoom, saveStatus } = useApp();
   const fileRef   = useRef(null);
   const [showStickers, setShowStickers] = useState(false);
+
+  const zoomIn  = () => setZoom(z => Math.min(MAX_ZOOM, parseFloat((z + ZOOM_STEP).toFixed(1))));
+  const zoomOut = () => setZoom(z => Math.max(MIN_ZOOM, parseFloat((z - ZOOM_STEP).toFixed(1))));
 
   return (
     <>
@@ -65,12 +72,32 @@ export default function Toolbar({ saveStatus, onImagePick, onStickerPlace }) {
         {/* Sticker panel */}
         <button className="nb-tool-btn" title="Stickers" onClick={() => setShowStickers(true)}>🌸</button>
 
+        {/* Zoom controls */}
+        <div className="nb-toolbar-divider" />
+        <button className="nb-tool-btn" title="Zoom out" onClick={zoomOut}
+          style={{ fontSize: '1rem', fontWeight: 'bold' }}>−</button>
+        <span style={{ fontSize: '0.6rem', color: 'var(--nb-pink-900)', fontWeight: 700,
+          textAlign: 'center', lineHeight: 1.2, userSelect: 'none' }}>
+          {Math.round(zoom * 100)}%
+        </span>
+        <button className="nb-tool-btn" title="Zoom in" onClick={zoomIn}
+          style={{ fontSize: '1rem', fontWeight: 'bold' }}>+</button>
+
         <div className="nb-toolbar-divider" style={{ marginTop: 'auto' }} />
-        {saveStatus && (
-          <span className="nb-save-status" style={{ writingMode: 'vertical-lr' }}>
-            {saveStatus === 'saving' ? '⏳' : saveStatus === 'saved' ? '✓' : saveStatus === 'error' ? '⚠' : ''}
-          </span>
-        )}
+
+        {/* Save-status badge */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 4 }}>
+          {saveStatus === 'saving' && (
+            <Spinner animation="border" size="sm"
+              style={{ color: 'var(--nb-pink-400)', width: 14, height: 14, borderWidth: 2 }} />
+          )}
+          {saveStatus === 'saved' && (
+            <span style={{ fontSize: '0.7rem', color: '#27ae60', fontWeight: 700 }}>✓</span>
+          )}
+          {saveStatus === 'error' && (
+            <span style={{ fontSize: '0.7rem', color: '#c0392b', fontWeight: 700 }}>⚠</span>
+          )}
+        </div>
       </nav>
 
       <StickerPanel show={showStickers} onHide={() => setShowStickers(false)} onPlace={onStickerPlace} />

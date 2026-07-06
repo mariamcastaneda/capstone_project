@@ -12,7 +12,7 @@ export default function ImageElement({ element, onUpdate, onDelete }) {
   return (
     <div tabIndex={0} onKeyDown={onKeyDown}
       style={{ position: 'absolute', left: pos.x, top: pos.y, width: size.w, height: size.h,
-        outline: 'none', cursor: 'move', userSelect: 'none' }}>
+        outline: 'none', cursor: 'move', userSelect: 'none', pointerEvents: 'auto' }}>
       <img src={src} alt={data.originalName ?? 'image'}
         style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block',
           border: '1.5px dashed transparent', borderRadius: 4 }}

@@ -231,20 +231,20 @@
 
 **Purpose**: Keyboard shortcuts, boundary enforcement, error handling, accessibility basics, quality gates.
 
-- [ ] T101 [P] Add global keyboard shortcut handler in `frontend/src/App.jsx` — `P`=Pen, `B`=Pencil, `E`=Eraser, `T`=Text, `M`=MindMap, `Ctrl+Z`=Undo, `Ctrl+Y`/`Ctrl+Shift+Z`=Redo, `Escape`=deselect; guard against firing inside `<input>` / `<textarea>` / `contentEditable`
-- [ ] T102 [P] Add zoom controls to `Toolbar.jsx` — "−" / "+" buttons + percentage display; clamp 50%–200%; sync with `DrawingCanvas` and `ElementOverlay` transform
-- [ ] T103 [P] Add canvas boundary clamping in `DrawingCanvas.jsx` and `ElementOverlay.jsx` — prevent any element being dragged or drawn outside 0–4000 × 0–3000 bounds (addresses edge case from spec)
-- [ ] T104 [P] Add save-status badge to `Toolbar.jsx` — show "Saving…" spinner (Bootstrap spinner) while `saveStatus === 'saving'`, "✓ Saved" text when `'saved'`, Bootstrap danger badge on `'error'`
-- [ ] T105 [P] Add Bootstrap `<Toast>` error notifications in `App.jsx` — triggered for: image upload failure (size exceeded, unsupported type), save failure, import parse error; message includes actionable fix text (Constitution V)
-- [ ] T106 [P] Add empty-state placeholder in `frontend/src/components/Canvas/CanvasPage.jsx` — shown when no active page selected; pink illustration + "Select or create a notebook to get started" text
-- [ ] T107 [P] Add `<ErrorBoundary>` wrapper in `frontend/src/App.jsx` — catches unexpected React render errors; displays user-friendly recovery message
-- [ ] T108 [P] Enable C# nullable reference types in `backend/CourseNotebook.Api/CourseNotebook.Api.csproj`; fix all nullable warnings
-- [ ] T109 [P] Run ESLint with `max-lines-per-function: 30` rule across all `frontend/src/` files; fix all violations (Constitution I)
-- [ ] T110 [P] Add SQLite indexes in a new EF Core migration: `Pages(NotebookId)`, `CanvasElements(PageId)`, `CanvasElements(ElementType)` — verify query plans with EXPLAIN QUERY PLAN
-- [ ] T111 [P] Security audit `backend/CourseNotebook.Api/Endpoints/ImageEndpoints.cs` — confirm server-side MIME type validation (not just file extension), sanitized `fileName` in static file serving, no path traversal possible (OWASP A01/A03)
-- [ ] T112 Run full backend test suite (`dotnet test`); verify ≥ 90% line coverage on all Service classes
-- [ ] T113 Run full frontend test suite (`npm test`); verify ≥ 90% line coverage on all hooks and API service files
-- [ ] T114 [P] Manual smoke test checklist — verify all 8 success criteria (SC-001 through SC-008) against a production build (`dotnet publish` + `npm run build`)
+- [x] T101 [P] Add global keyboard shortcut handler in `frontend/src/App.jsx` — `P`=Pen, `B`=Pencil, `E`=Eraser, `T`=Text, `M`=MindMap, `Ctrl+Z`=Undo, `Ctrl+Y`/`Ctrl+Shift+Z`=Redo, `Escape`=deselect; guard against firing inside `<input>` / `<textarea>` / `contentEditable`
+- [x] T102 [P] Add zoom controls to `Toolbar.jsx` — "−" / "+" buttons + percentage display; clamp 50%–200%; sync with `DrawingCanvas` and `ElementOverlay` transform
+- [x] T103 [P] Add canvas boundary clamping in `DrawingCanvas.jsx` and `ElementOverlay.jsx` — prevent any element being dragged or drawn outside 0–4000 × 0–3000 bounds (addresses edge case from spec)
+- [x] T104 [P] Add save-status badge to `Toolbar.jsx` — show "Saving…" spinner (Bootstrap spinner) while `saveStatus === 'saving'`, "✓ Saved" text when `'saved'`, Bootstrap danger badge on `'error'`
+- [x] T105 [P] Add Bootstrap `<Toast>` error notifications in `App.jsx` — triggered for: image upload failure (size exceeded, unsupported type), save failure, import parse error; message includes actionable fix text (Constitution V)
+- [x] T106 [P] Add empty-state placeholder in `frontend/src/components/Canvas/CanvasPage.jsx` — shown when no active page selected; pink illustration + "Select or create a notebook to get started" text
+- [x] T107 [P] Add `<ErrorBoundary>` wrapper in `frontend/src/App.jsx` — catches unexpected React render errors; displays user-friendly recovery message
+- [x] T108 [P] Enable C# nullable reference types in `backend/CourseNotebook.Api/CourseNotebook.Api.csproj`; fix all nullable warnings
+- [x] T109 [P] Run ESLint with `max-lines-per-function: 30` rule across all `frontend/src/` files; fix all violations (Constitution I)
+- [x] T110 [P] Add SQLite indexes in a new EF Core migration: `Pages(NotebookId)`, `CanvasElements(PageId)`, `CanvasElements(ElementType)` — verify query plans with EXPLAIN QUERY PLAN
+- [x] T111 [P] Security audit `backend/CourseNotebook.Api/Endpoints/ImageEndpoints.cs` — confirm server-side MIME type validation (not just file extension), sanitized `fileName` in static file serving, no path traversal possible (OWASP A01/A03)
+- [x] T112 Run full backend test suite (`dotnet test`); verify ≥ 90% line coverage on all Service classes
+- [x] T113 Run full frontend test suite (`npm test`); verify ≥ 90% line coverage on all hooks and API service files
+- [x] T114 [P] Manual smoke test checklist — verify all 8 success criteria (SC-001 through SC-008) against a production build (`dotnet publish` + `npm run build`)
 
 ---
 
@@ -287,6 +287,22 @@
 
 - [x] T134 [P] Replace `frontend/src/App.css` content with empty file (zero rules) — current Vite boilerplate counters and hero styles conflict with Bootstrap `d-flex` layout (unrequested)
 - [x] T135 [P] Replace `frontend/src/index.css` with a minimal body reset (`body { margin: 0; padding: 0; }`) — current Vite default CSS conflicts with `--bs-body-bg` override in `theme.css` (partial)
+
+---
+
+## Phase 11: Bug Fixes — Drawing, Text & Mind Map
+
+**Root-cause summary** (discovered during manual testing):
+
+- **Drawing tools blocked**: `ElementOverlay`'s inner wrapper div has `pointerEvents: 'auto'` and spans the full 4000×3000 canvas, sitting above the `<canvas>` element and intercepting every pointer event before it reaches the drawing layer. Fix: set inner div to `pointerEvents: 'none'`; give individual elements their own `pointerEvents: 'auto'`.
+- **Text tool no focus**: `TextBoxElement` never calls `.focus()` on mount so the cursor never appears; `e.preventDefault()` in the drag-start handler also blocks browser focus. Fix: auto-focus contentEditable on creation; skip `preventDefault` when clicking the text area.
+- **Mind map nodes jump on drag**: `MindMapNode` drag handler records and replays raw viewport pixel coordinates (`clientX/Y`), but nodes live inside a `scale(zoom) translate(panX, panY)` CSS container. No conversion applied → nodes jump to viewport origin. Fix: convert viewport → canvas space using `(clientX − panX) / zoom`. Additionally, `persist()` reads `map.nodes` immediately after `dispatch()`, getting stale pre-dispatch state; fix by persisting inside a `useEffect` that fires after state settles.
+
+- [x] T136 Fix `frontend/src/components/Canvas/ElementOverlay.jsx` — change inner wrapper div from `pointerEvents: 'auto'` to `pointerEvents: 'none'`; pointer events now fall through to the `<canvas>` below for drawing tools (bug: drawing blocked)
+- [x] T137 [P] Add `pointerEvents: 'auto'` explicitly to the outermost `<div>` of `frontend/src/components/Canvas/TextBoxElement.jsx`, `ImageElement.jsx`, and `StickerElement.jsx` so they remain interactive after the ElementOverlay inner div change (depends on T136)
+- [x] T138 Fix `frontend/src/components/Canvas/TextBoxElement.jsx` — add `useEffect` that calls `divRef.current.focus()` when `data.content` is empty (newly-created box); remove `e.preventDefault()` from `onMouseDown` so browser focus lands on the contentEditable when clicking the text area (bug: text tool no focus / no keyboard input)
+- [x] T139 Fix `frontend/src/components/MindMap/MindMapNode.jsx` — convert drag coordinates from viewport space to canvas space: accept `zoom`, `panX`, `panY` props; compute `startX = (e.clientX − panX) / zoom − x` and on each move `onMove(id, (me.clientX − panX) / zoom − startX, (me.clientY − panY) / zoom − startY)` (bug: mind map nodes jump on drag)
+- [x] T140 Fix `frontend/src/components/MindMap/MindMapCanvas.jsx` — pass `zoom`, `panX`, `panY` down to each `<MindMapNode>`; replace immediate `persist(map.nodes, map.edges)` calls with a `useEffect(() => { persist(...) }, [map.nodes, map.edges])` so persist fires after React state has settled (bug: stale state persisted; nodes jump)
 
 ```
 Phase 1 (T001–T007)
@@ -343,5 +359,8 @@ US3, US4, and US5 can be implemented **in parallel** once US2 (DrawingCanvas + E
 **Total tasks**: 114 · **Parallelizable tasks**: 52 · **Test tasks (TDD gates)**: 22
 
 **Suggested MVP scope**: Complete Phases 1–3 (T001–T041) for a shippable notebook organizer with full persistence before adding canvas features.
+
+
+
 
 

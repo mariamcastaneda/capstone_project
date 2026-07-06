@@ -7,11 +7,10 @@ export default function ElementOverlay({ zoom, panX, panY, children }) {
       width: 4000, height: 3000,
       transformOrigin: '0 0',
       transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
-      pointerEvents: 'none',
+      pointerEvents: 'none',   // outer: let drawing canvas receive events
     }}>
-      <div style={{ position: 'relative', width: '100%', height: '100%', pointerEvents: 'auto' }}>
-        {children}
-      </div>
+      {/* No inner wrapper — children render directly with their own pointerEvents */}
+      {children}
     </div>
   );
 }

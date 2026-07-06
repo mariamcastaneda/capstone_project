@@ -17,9 +17,11 @@ export function AppProvider({ children }) {
   const [activeTool, setActiveTool]             = useState(TOOLS.PEN);
   const [activeColor, setActiveColor]           = useState('#222222');
   const [strokeWidth, setStrokeWidth]           = useState(3);
-  const [eraserMode, setEraserMode]             = useState('stroke'); // 'stroke' | 'pixel'
+  const [eraserMode, setEraserMode]             = useState('stroke');
   const [notebooks, setNotebooks]               = useState([]);
-  const [pages, setPages]                       = useState({});  // notebookId → Page[]
+  const [pages, setPages]                       = useState({});
+  const [zoom, setZoom]                         = useState(1);
+  const [saveStatus, setSaveStatus]             = useState('idle'); // 'idle'|'saving'|'saved'|'error'
 
   return (
     <AppContext.Provider value={{
@@ -31,6 +33,8 @@ export function AppProvider({ children }) {
       eraserMode,       setEraserMode,
       notebooks,        setNotebooks,
       pages,            setPages,
+      zoom,             setZoom,
+      saveStatus,       setSaveStatus,
     }}>
       {children}
     </AppContext.Provider>

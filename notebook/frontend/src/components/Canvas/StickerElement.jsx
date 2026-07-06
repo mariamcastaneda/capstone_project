@@ -17,7 +17,7 @@ export default function StickerElement({ element, onUpdate, onDelete }) {
     <div tabIndex={0} onKeyDown={onKeyDown}
       style={{ position: 'absolute', left: pos.x, top: pos.y,
         width: size.w, height: size.h,
-        outline: 'none', cursor: 'move', userSelect: 'none' }}>
+        outline: 'none', cursor: 'move', userSelect: 'none', pointerEvents: 'auto' }}>
       {svgDataUrl
         ? <img src={svgDataUrl} alt={data.stickerName ?? 'sticker'}
             style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', pointerEvents: 'none' }} />
