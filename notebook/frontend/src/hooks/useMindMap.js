@@ -2,16 +2,19 @@ import { useCallback, useReducer } from 'react';
 
 const SPACING = { horizontal: 180, vertical: 100 };
 
+let _idCounter = 0;
+const uid = () => `mm-${++_idCounter}-${Math.random().toString(36).slice(2, 7)}`;
+
 function reducer(state, action) {
   switch (action.type) {
     case 'ADD_NODE': {
       const node = {
-        id: `n-${Date.now()}`, label: action.payload.label ?? 'New Idea',
+        id: uid(), label: action.payload.label ?? 'New Idea',
         shape: 'rounded', fillColor: '#FFD6E7', borderColor: '#FF69B4', textColor: '#2d1a24',
         x: action.payload.x ?? 300, y: action.payload.y ?? 200,
       };
       const edges = action.payload.parentId
-        ? [...state.edges, { id: `e-${Date.now()}`, from: action.payload.parentId, to: node.id, label: '' }]
+        ? [...state.edges, { id: uid(), from: action.payload.parentId, to: node.id, label: '' }]
         : state.edges;
       return { ...state, nodes: [...state.nodes, node], edges };
     }
@@ -25,7 +28,7 @@ function reducer(state, action) {
       return { ...state, nodes };
     }
     case 'ADD_EDGE': {
-      const edge = { id: `e-${Date.now()}`, from: action.payload.from, to: action.payload.to, label: '' };
+      const edge = { id: uid(), from: action.payload.from, to: action.payload.to, label: '' };
       return { ...state, edges: [...state.edges, edge] };
     }
     case 'UPDATE_EDGE': {

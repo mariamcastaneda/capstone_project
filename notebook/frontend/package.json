@@ -7,7 +7,20 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest --testEnvironment jsdom"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "<rootDir>/__mocks__/styleMock.cjs",
+      "\\.(png|jpg|jpeg|gif|svg|webp)$": "<rootDir>/__mocks__/fileMock.cjs"
+    },
+    "setupFilesAfterEnv": ["@testing-library/jest-dom"],
+    "testMatch": ["**/tests/**/*.test.[jt]s?(x)"]
   },
   "dependencies": {
     "bootstrap": "^5.3.8",

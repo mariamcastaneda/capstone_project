@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { AppProvider, useApp, TOOLS } from './context/AppContext';
 import Sidebar from './components/Sidebar/Sidebar';
 import Toolbar from './components/Toolbar/Toolbar';
@@ -7,10 +7,20 @@ import * as notebookApi from './services/notebookApi';
 import * as pageApi from './services/pageApi';
 
 function WorkArea() {
+  const canvasRef = useRef(null);
+
+  const handleImagePick = useCallback((file) => {
+    canvasRef.current?.handleImagePick?.(file);
+  }, []);
+
+  const handleStickerPlace = useCallback((sticker) => {
+    canvasRef.current?.handleStickerPlace?.(sticker);
+  }, []);
+
   return (
     <div className="d-flex flex-grow-1" style={{ overflow: 'hidden' }}>
-      <Toolbar />
-      <CanvasPage />
+      <Toolbar onImagePick={handleImagePick} onStickerPlace={handleStickerPlace} />
+      <CanvasPage ref={canvasRef} />
     </div>
   );
 }

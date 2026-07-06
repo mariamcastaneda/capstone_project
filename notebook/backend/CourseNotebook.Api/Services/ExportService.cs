@@ -37,8 +37,10 @@ public sealed class ExportService
             var manifest = new { notebook, pages, elements };
             var json = JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true });
             var entry = zip.CreateEntry("notebook.json");
-            using var writer = new StreamWriter(entry.Open());
-            await writer.WriteAsync(json);
+            using (var writer = new StreamWriter(entry.Open()))
+            {
+                await writer.WriteAsync(json);
+            } // entry stream closed before next entry
 
             foreach (var file in imageFiles)
             {

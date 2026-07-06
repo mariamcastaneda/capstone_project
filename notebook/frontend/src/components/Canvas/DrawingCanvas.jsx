@@ -1,15 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useApp, TOOLS } from '../../context/AppContext';
 import useCanvas from '../../hooks/useCanvas';
 
 const CANVAS_W = 4000;
 const CANVAS_H = 3000;
 
-export default function DrawingCanvas({ zoom, panX, panY, onPanStart, onStrokeComplete }) {
+export default function DrawingCanvas({ zoom, panX, panY, onStrokeComplete, initialStrokes }) {
   const canvasRef = useRef(null);
   const { activeTool, activeColor, strokeWidth, eraserMode } = useApp();
 
-  const { onPointerDown, onPointerMove, onPointerUp } = useCanvas({
+  const { onPointerDown, onPointerMove, onPointerUp, loadStrokes } = useCanvas({
     canvasRef,
     color: activeColor,
     strokeWidth,
@@ -17,6 +17,11 @@ export default function DrawingCanvas({ zoom, panX, panY, onPanStart, onStrokeCo
     eraserMode,
     onStrokeComplete,
   });
+
+  // Restore persisted strokes whenever the active page changes (SC-008)
+  useEffect(() => {
+    if (initialStrokes) loadStrokes(initialStrokes);
+  }, [initialStrokes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isDrawTool = activeTool === TOOLS.PEN || activeTool === TOOLS.PENCIL || activeTool === TOOLS.ERASER;
 

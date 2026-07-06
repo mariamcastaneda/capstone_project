@@ -254,39 +254,39 @@
 
 ### CRITICAL — Constitution III (TDD NON-NEGOTIABLE)
 
-- [ ] T115 Create `frontend/babel.config.cjs` with `@babel/preset-env` + `@babel/preset-react`; add `"test": "jest --testEnvironment jsdom"` script and `jest` config block (`transform`, `moduleNameMapper` for CSS) to `frontend/package.json`; create `frontend/tests/unit/` and `frontend/tests/integration/` directories per Constitution III (missing)
-- [ ] T116 [P] Write `backend/CourseNotebook.Tests/Unit/NotebookServiceTests.cs` — tests: CreateNotebook persists, RenameNotebook updates name, DeleteNotebook cascades pages, duplicate names allowed; use in-memory SQLite via `UseInMemoryDatabase` per Constitution III (missing) — replaces placeholder T025
-- [ ] T117 [P] Write `backend/CourseNotebook.Tests/Unit/PageServiceTests.cs` — tests: CreatePage adds to notebook, RenamePage updates, DeletePage removes elements; in-memory SQLite per Constitution III (missing) — replaces placeholder T026
-- [ ] T118 [P] Write `backend/CourseNotebook.Tests/Unit/ElementServiceTests.cs` — tests: createElement, updateElement, deleteElement, deleteByPage; in-memory SQLite per Constitution III (missing) — replaces placeholder T044
-- [ ] T119 [P] Write `backend/CourseNotebook.Tests/Unit/ExportServiceTests.cs` — tests: ZIP contains `notebook.json`, images folder populated, missing image skipped gracefully per Constitution III (missing) — replaces placeholder T093
-- [ ] T120 [P] Write `backend/CourseNotebook.Tests/Unit/ImportServiceTests.cs` — tests: valid ZIP restores entities with new GUIDs, images copied, invalid ZIP throws `InvalidOperationException`, duplicate names allowed per FR-033 (missing) — replaces placeholder T094
-- [ ] T121 [P] Write `backend/CourseNotebook.Tests/Integration/NotebookEndpointTests.cs` — integration tests for `GET/POST/PUT/DELETE /api/notebooks` and pages using `WebApplicationFactory<Program>` + SQLite in-memory per Constitution III (missing) — replaces placeholder T027
-- [ ] T122 [P] Write `frontend/tests/unit/useUndoRedo.test.js` — tests: push advances history, undo restores prior state, redo re-applies, max 100 entries drops oldest, clear resets per Constitution III (missing) — replaces placeholder T042
-- [ ] T123 [P] Write `frontend/tests/unit/useMindMap.test.js` — tests: addNode returns id, addEdge connects, removeNode cascades edges, autoLayoutRadial spaces nodes, autoLayoutHierarchical produces rows per Constitution III (missing) — replaces placeholder T083
-- [ ] T124 [P] Write `frontend/tests/integration/Sidebar.test.jsx` — RTL tests: empty state renders, "New Notebook" modal opens and creates, rename inline flow, delete confirm modal flow; mock `notebookApi` + `pageApi` per Constitution III (missing) — replaces placeholder T028
+- [x] T115 Create `frontend/babel.config.cjs` with `@babel/preset-env` + `@babel/preset-react`; add `"test": "jest --testEnvironment jsdom"` script and `jest` config block (`transform`, `moduleNameMapper` for CSS) to `frontend/package.json`; create `frontend/tests/unit/` and `frontend/tests/integration/` directories per Constitution III (missing)
+- [x] T116 [P] Write `backend/CourseNotebook.Tests/Unit/NotebookServiceTests.cs` — tests: CreateNotebook persists, RenameNotebook updates name, DeleteNotebook cascades pages, duplicate names allowed; use in-memory SQLite via `UseInMemoryDatabase` per Constitution III (missing) — replaces placeholder T025
+- [x] T117 [P] Write `backend/CourseNotebook.Tests/Unit/PageServiceTests.cs` — tests: CreatePage adds to notebook, RenamePage updates, DeletePage removes elements; in-memory SQLite per Constitution III (missing) — replaces placeholder T026
+- [x] T118 [P] Write `backend/CourseNotebook.Tests/Unit/ElementServiceTests.cs` — tests: createElement, updateElement, deleteElement, deleteByPage; in-memory SQLite per Constitution III (missing) — replaces placeholder T044
+- [x] T119 [P] Write `backend/CourseNotebook.Tests/Unit/ExportServiceTests.cs` — tests: ZIP contains `notebook.json`, images folder populated, missing image skipped gracefully per Constitution III (missing) — replaces placeholder T093
+- [x] T120 [P] Write `backend/CourseNotebook.Tests/Unit/ImportServiceTests.cs` — tests: valid ZIP restores entities with new GUIDs, images copied, invalid ZIP throws `InvalidOperationException`, duplicate names allowed per FR-033 (missing) — replaces placeholder T094
+- [x] T121 [P] Write `backend/CourseNotebook.Tests/Integration/NotebookEndpointTests.cs` — integration tests for `GET/POST/PUT/DELETE /api/notebooks` and pages using `WebApplicationFactory<Program>` + SQLite in-memory per Constitution III (missing) — replaces placeholder T027
+- [x] T122 [P] Write `frontend/tests/unit/useUndoRedo.test.js` — tests: push advances history, undo restores prior state, redo re-applies, max 100 entries drops oldest, clear resets per Constitution III (missing) — replaces placeholder T042
+- [x] T123 [P] Write `frontend/tests/unit/useMindMap.test.js` — tests: addNode returns id, addEdge connects, removeNode cascades edges, autoLayoutRadial spaces nodes, autoLayoutHierarchical produces rows per Constitution III (missing) — replaces placeholder T083
+- [x] T124 [P] Write `frontend/tests/integration/Sidebar.test.jsx` — RTL tests: empty state renders, "New Notebook" modal opens and creates, rename inline flow, delete confirm modal flow; mock `notebookApi` + `pageApi` per Constitution III (missing) — replaces placeholder T028
 
 ### HIGH — Missing components (FR / plan gaps)
 
-- [ ] T125 [P] Create `frontend/src/assets/stickers/` directory; add 30 inline SVG sticker files across 3 subdirs (`academic/`, `emotions/`, `symbols/`, 10 each); create `frontend/src/assets/stickers/stickerRegistry.js` exporting `{ academic: [...], emotions: [...], symbols: [...] }` per FR-019 (missing)
-- [ ] T126 [P] Create `frontend/src/components/Canvas/StickerElement.jsx` — identical behaviour to `ImageElement.jsx`; resolves `src` from `stickerRegistry` by `data.stickerName`; no server upload; movable, resizable, rotatable, Delete-key removable per FR-020 (missing)
-- [ ] T127 Create `frontend/src/components/MindMap/MindMapToolbar.jsx` — shown when `activeTool === 'mindmap'`; renders node-shape selector (rect/circle/diamond/rounded), fill/border/text color pickers, "Auto-layout Radial" and "Auto-layout Hierarchical" buttons, "Export PNG" button; integrates with `useMindMap` context per FR-025, FR-026 (missing)
-- [ ] T128 Add text-formatting controls to `frontend/src/components/Toolbar/Toolbar.jsx` when `activeTool === 'text'`: font-family `<select>` (10 fonts), font-size `<input type="number" min="8" max="200">`, Bold/Italic/Underline/Strikethrough toggle buttons, text-color + highlight-color pickers (reuse `ColorPicker`); store selections in AppContext per FR-012, FR-013, FR-014 (missing)
-- [ ] T129 Add image drag-and-drop to `frontend/src/components/Canvas/CanvasPage.jsx` — `onDragOver` + `onDrop` handlers; `e.dataTransfer.files[0]` → `imageApi.uploadImage()` → `elementApi.createElement(..., elementType:'image')` → append to elements state per FR-017 (missing)
-- [ ] T130 [P] Add image file-picker button to `frontend/src/components/Toolbar/Toolbar.jsx` — `<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" hidden>` triggered by a toolbar button; same upload + createElement flow as drag-drop (T129) per FR-017 (missing)
-- [ ] T131 Add sticker panel Bootstrap `<Offcanvas>` triggered from `Toolbar.jsx` — category tabs using `stickerRegistry` categories; sticker grid; on click: `elementApi.createElement(activePageId, { elementType:'sticker', data:{ stickerName, stickerSrc } })` per FR-019 (missing)
+- [x] T125 [P] Create `frontend/src/assets/stickers/` directory; add 30 inline SVG sticker files across 3 subdirs (`academic/`, `emotions/`, `symbols/`, 10 each); create `frontend/src/assets/stickers/stickerRegistry.js` exporting `{ academic: [...], emotions: [...], symbols: [...] }` per FR-019 (missing)
+- [x] T126 [P] Create `frontend/src/components/Canvas/StickerElement.jsx` — identical behaviour to `ImageElement.jsx`; resolves `src` from `stickerRegistry` by `data.stickerName`; no server upload; movable, resizable, rotatable, Delete-key removable per FR-020 (missing)
+- [x] T127 Create `frontend/src/components/MindMap/MindMapToolbar.jsx` — shown when `activeTool === 'mindmap'`; renders node-shape selector (rect/circle/diamond/rounded), fill/border/text color pickers, "Auto-layout Radial" and "Auto-layout Hierarchical" buttons, "Export PNG" button; integrates with `useMindMap` context per FR-025, FR-026 (missing)
+- [x] T128 Add text-formatting controls to `frontend/src/components/Toolbar/Toolbar.jsx` when `activeTool === 'text'`: font-family `<select>` (10 fonts), font-size `<input type="number" min="8" max="200">`, Bold/Italic/Underline/Strikethrough toggle buttons, text-color + highlight-color pickers (reuse `ColorPicker`); store selections in AppContext per FR-012, FR-013, FR-014 (missing)
+- [x] T129 Add image drag-and-drop to `frontend/src/components/Canvas/CanvasPage.jsx` — `onDragOver` + `onDrop` handlers; `e.dataTransfer.files[0]` → `imageApi.uploadImage()` → `elementApi.createElement(..., elementType:'image')` → append to elements state per FR-017 (missing)
+- [x] T130 [P] Add image file-picker button to `frontend/src/components/Toolbar/Toolbar.jsx` — `<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" hidden>` triggered by a toolbar button; same upload + createElement flow as drag-drop (T129) per FR-017 (missing)
+- [x] T131 Add sticker panel Bootstrap `<Offcanvas>` triggered from `Toolbar.jsx` — category tabs using `stickerRegistry` categories; sticker grid; on click: `elementApi.createElement(activePageId, { elementType:'sticker', data:{ stickerName, stickerSrc } })` per FR-019 (missing)
 
 ### HIGH — Stroke restore on page load (SC-008)
 
-- [ ] T132 Wire persisted stroke restore in `frontend/src/components/Canvas/DrawingCanvas.jsx`: accept `initialStrokes` prop (array of stroke objects parsed from elementType=`stroke` elements); call `loadStrokes(initialStrokes)` from `useCanvas` inside a `useEffect` when `initialStrokes` changes; pass parsed strokes from `CanvasPage.jsx` per SC-008 (partial)
+- [x] T132 Wire persisted stroke restore in `frontend/src/components/Canvas/DrawingCanvas.jsx`: accept `initialStrokes` prop (array of stroke objects parsed from elementType=`stroke` elements); call `loadStrokes(initialStrokes)` from `useCanvas` inside a `useEffect` when `initialStrokes` changes; pass parsed strokes from `CanvasPage.jsx` per SC-008 (partial)
 
 ### HIGH — Missing .gitignore (T004 false-positive)
 
-- [ ] T133 [P] Create `.gitignore` at `notebook/` root with entries: `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `node_modules/`, `dist/`, `data/images/`, `.env`, `.DS_Store`, `Thumbs.db` per T004 (missing)
+- [x] T133 [P] Create `.gitignore` at `notebook/` root with entries: `bin/`, `obj/`, `*.db`, `*.db-shm`, `*.db-wal`, `node_modules/`, `dist/`, `data/images/`, `.env`, `.DS_Store`, `Thumbs.db` per T004 (missing)
 
 ### MEDIUM — Boilerplate conflicts with Bootstrap layout
 
-- [ ] T134 [P] Replace `frontend/src/App.css` content with empty file (zero rules) — current Vite boilerplate counters and hero styles conflict with Bootstrap `d-flex` layout (unrequested)
-- [ ] T135 [P] Replace `frontend/src/index.css` with a minimal body reset (`body { margin: 0; padding: 0; }`) — current Vite default CSS conflicts with `--bs-body-bg` override in `theme.css` (partial)
+- [x] T134 [P] Replace `frontend/src/App.css` content with empty file (zero rules) — current Vite boilerplate counters and hero styles conflict with Bootstrap `d-flex` layout (unrequested)
+- [x] T135 [P] Replace `frontend/src/index.css` with a minimal body reset (`body { margin: 0; padding: 0; }`) — current Vite default CSS conflicts with `--bs-body-bg` override in `theme.css` (partial)
 
 ```
 Phase 1 (T001–T007)
@@ -343,4 +343,5 @@ US3, US4, and US5 can be implemented **in parallel** once US2 (DrawingCanvas + E
 **Total tasks**: 114 · **Parallelizable tasks**: 52 · **Test tasks (TDD gates)**: 22
 
 **Suggested MVP scope**: Complete Phases 1–3 (T001–T041) for a shippable notebook organizer with full persistence before adding canvas features.
+
 
