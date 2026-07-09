@@ -106,37 +106,35 @@ export default function Toolbar({ onImagePick, onStickerPlace }) {
 }
 
 function TextFormattingControls() {
-  const [font, setFont]     = useState('Arial');
-  const [size, setSize]     = useState(16);
-  const [bold, setBold]     = useState(false);
-  const [italic, setItalic] = useState(false);
-
-  const applyCmd = (cmd) => { try { document.execCommand(cmd); } catch {} };
+  const { fontFamily, setFontFamily, fontSize, setFontSize,
+          textBold, setTextBold, textItalic, setTextItalic,
+          textUnderline, setTextUnderline } = useApp();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'stretch', padding: '0 2px' }}>
-      <select value={font} onChange={e => { setFont(e.target.value); applyCmd('fontName'); }}
+      <select value={fontFamily} onChange={e => setFontFamily(e.target.value)}
         style={{ fontSize: '0.65rem', border: '1px solid var(--nb-pink-300)', borderRadius: 4,
           background: 'var(--nb-pink-50)', color: 'var(--nb-pink-900)', maxWidth: 44 }}>
         {FONTS.map(f => <option key={f} value={f}>{f.split(' ')[0]}</option>)}
       </select>
-      <input type="number" min={8} max={200} value={size}
-        onChange={e => setSize(Number(e.target.value))}
+      <input type="number" min={8} max={200} value={fontSize}
+        onChange={e => setFontSize(Math.max(8, Math.min(200, Number(e.target.value))))}
         style={{ width: 44, fontSize: '0.65rem', border: '1px solid var(--nb-pink-300)',
           borderRadius: 4, background: 'var(--nb-pink-50)', color: 'var(--nb-pink-900)', textAlign: 'center' }} />
       <div style={{ display: 'flex', gap: 2 }}>
-        <button onClick={() => { setBold(b => !b); applyCmd('bold'); }}
-          className={`nb-tool-btn ${bold ? 'active' : ''}`}
+        <button onClick={() => setTextBold(b => !b)}
+          className={`nb-tool-btn ${textBold ? 'active' : ''}`}
           style={{ width: 20, height: 20, fontSize: '0.7rem', fontWeight: 'bold' }} title="Bold">B</button>
-        <button onClick={() => { setItalic(i => !i); applyCmd('italic'); }}
-          className={`nb-tool-btn ${italic ? 'active' : ''}`}
+        <button onClick={() => setTextItalic(i => !i)}
+          className={`nb-tool-btn ${textItalic ? 'active' : ''}`}
           style={{ width: 20, height: 20, fontSize: '0.7rem', fontStyle: 'italic' }} title="Italic">I</button>
       </div>
       <div style={{ display: 'flex', gap: 2 }}>
-        <button onClick={() => applyCmd('underline')}
-          className="nb-tool-btn" style={{ width: 20, height: 20, fontSize: '0.65rem', textDecoration: 'underline' }} title="Underline">U</button>
-        <button onClick={() => applyCmd('strikeThrough')}
-          className="nb-tool-btn" style={{ width: 20, height: 20, fontSize: '0.65rem', textDecoration: 'line-through' }} title="Strike">S</button>
+        <button onClick={() => setTextUnderline(u => !u)}
+          className={`nb-tool-btn ${textUnderline ? 'active' : ''}`}
+          style={{ width: 20, height: 20, fontSize: '0.65rem', textDecoration: 'underline' }} title="Underline">U</button>
+        <button className="nb-tool-btn"
+          style={{ width: 20, height: 20, fontSize: '0.65rem', textDecoration: 'line-through' }} title="Strike">S</button>
       </div>
     </div>
   );

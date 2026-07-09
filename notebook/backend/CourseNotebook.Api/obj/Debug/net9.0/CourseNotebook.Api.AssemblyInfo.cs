@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CourseNotebook.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aa7bcb804c88dbdbd493f582fce0e5daa9811fc8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a33d0a4a3e932f59c7ef537e9c1077881ac1e69")]
 [assembly: System.Reflection.AssemblyProductAttribute("CourseNotebook.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CourseNotebook.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
