@@ -1,24 +1,28 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useApp, TOOLS } from '../../context/AppContext';
 import useCanvas from '../../hooks/useCanvas';
 
 const CANVAS_W = 4000;
 const CANVAS_H = 3000;
 
-export default function DrawingCanvas({ zoom, panX, panY, onStrokeComplete, initialStrokes }) {
+export default forwardRef(function DrawingCanvas({ zoom, panX, panY, onStrokeComplete, onStrokeErased, initialStrokes }, ref) {
   const canvasRef = useRef(null);
   const { activeTool, activeColor, strokeWidth, eraserMode } = useApp();
 
-  const { onPointerDown, onPointerMove, onPointerUp, loadStrokes } = useCanvas({
+  const { onPointerDown, onPointerMove, onPointerUp, loadStrokes, clearStrokes } = useCanvas({
     canvasRef,
     color: activeColor,
     strokeWidth,
     tool: activeTool,
     eraserMode,
     onStrokeComplete,
+    onStrokeErased,
   });
 
-  // Restore persisted strokes whenever the active page changes (SC-008)
+  // Expose loadStrokes/clearStrokes imperatively for CanvasPage to call
+  useImperativeHandle(ref, () => ({ loadStrokes, clearStrokes }), [loadStrokes, clearStrokes]);
+
+  // Reload strokes when the stable memoized list changes (page switch or DB state change)
   useEffect(() => {
     if (initialStrokes) loadStrokes(initialStrokes);
   }, [initialStrokes]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -43,4 +47,4 @@ export default function DrawingCanvas({ zoom, panX, panY, onStrokeComplete, init
       onPointerUp={onPointerUp}
     />
   );
-}
+});

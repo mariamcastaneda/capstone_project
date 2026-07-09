@@ -1,21 +1,42 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import useMindMap from '../../hooks/useMindMap';
+import { useApp } from '../../context/AppContext';
 import * as elementApi from '../../services/elementApi';
 import MindMapNode from './MindMapNode';
 import MindMapEdge from './MindMapEdge';
 
-export default function MindMapCanvas({ zoom, panX, panY, pageId, existingElement, onSave }) {
+export default forwardRef(function MindMapCanvas({ zoom, panX, panY, pageId, existingElement, onSave, isEditing, onDelete }, ref) {
   const map    = useMindMap();
   const elId   = useRef(existingElement?.id ?? null);
   const isMounted = useRef(false);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const { activeColor } = useApp();
 
-  // Hydrate from persisted data on first mount only
+  // Expose addNodeAt for programmatic node creation (kept but not used by canvas click)
+  useImperativeHandle(ref, () => ({
+    addNodeAt: (x, y) => map.addNode({ label: 'New Idea', x, y }),
+  }), [map]);
+
+  // When active color changes and a node is selected, apply it as the node's fill color
   useEffect(() => {
+    if (selectedNodeId && isMounted.current) {
+      map.updateNode(selectedNodeId, { fillColor: activeColor });
+    }
+  }, [activeColor]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Hydrate whenever the backing element becomes available (handles async API load)
+  useEffect(() => {
+    isMounted.current = false; // suppress persist during hydration
+    if (existingElement?.id) {
+      elId.current = existingElement.id;
+    }
     if (existingElement?.data) {
       try { map.hydrate(JSON.parse(existingElement.data)); } catch {}
     }
-    isMounted.current = true;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // Allow persist after a tick so the hydration dispatch settles first
+    const t = setTimeout(() => { isMounted.current = true; }, 50);
+    return () => clearTimeout(t);
+  }, [existingElement?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist whenever state settles after any change (skips the initial hydration render)
   useEffect(() => {
@@ -58,12 +79,21 @@ export default function MindMapCanvas({ zoom, panX, panY, pageId, existingElemen
 
   return (
     <>
-      <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 4 }}>
-        <button className="btn btn-sm" style={{ background: 'var(--nb-pink-400)', color: '#fff' }} onClick={handleAddNode}>＋ Node</button>
-        <button className="btn btn-sm" style={{ background: 'var(--nb-pink-100)' }} onClick={map.autoLayoutRadial}>Radial</button>
-        <button className="btn btn-sm" style={{ background: 'var(--nb-pink-100)' }} onClick={map.autoLayoutHierarchical}>Tree</button>
-        <button className="btn btn-sm" style={{ background: 'var(--nb-pink-200)' }} onClick={exportPng}>⬇ PNG</button>
-      </div>
+      {isEditing && (
+        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 4 }}>
+          <button className="btn btn-sm" style={{ background: 'var(--nb-pink-400)', color: '#fff' }} onClick={handleAddNode}>＋ Node</button>
+          <button className="btn btn-sm" style={{ background: 'var(--nb-pink-100)' }} onClick={map.autoLayoutRadial}>Radial</button>
+          <button className="btn btn-sm" style={{ background: 'var(--nb-pink-100)' }} onClick={map.autoLayoutHierarchical}>Tree</button>
+          <button className="btn btn-sm" style={{ background: 'var(--nb-pink-200)' }} onClick={exportPng}>⬇ PNG</button>
+          {onDelete && (
+            <button className="btn btn-sm" style={{ background: '#c0392b', color: '#fff' }}
+              title="Delete this mind map"
+              onClick={() => { if (window.confirm('Delete this entire mind map?')) onDelete(); }}>
+              🗑 Delete Map
+            </button>
+          )}
+        </div>
+      )}
       <svg id="nb-mindmap-svg"
         style={{ position: 'absolute', top: 0, left: 0, width: 4000, height: 3000,
           transformOrigin: '0 0', transform: `translate(${panX}px,${panY}px) scale(${zoom})`,
@@ -77,16 +107,22 @@ export default function MindMapCanvas({ zoom, panX, panY, pageId, existingElemen
       </svg>
       <div style={{ position: 'absolute', top: 0, left: 0, width: 4000, height: 3000,
         transformOrigin: '0 0', transform: `translate(${panX}px,${panY}px) scale(${zoom})`,
-        pointerEvents: 'none' }}>
+        pointerEvents: 'none' }}
+        onClick={() => setSelectedNodeId(null)}
+      >
         {map.nodes.map(n => (
           <MindMapNode key={n.id} node={n}
             zoom={zoom} panX={panX} panY={panY}
+            isEditing={isEditing}
+            isSelected={selectedNodeId === n.id}
+            onSelect={(id) => setSelectedNodeId(prev => prev === id ? null : id)}
+            onLabelChange={(id, newLabel) => map.updateNode(id, { label: newLabel })}
             onMove={(id, x, y) => map.updateNode(id, { x, y })}
             onAddChild={(parentId) => map.addNode({ parentId, x: n.x + 200, y: n.y + 100 })}
-            onRemove={(id) => map.removeNode(id)}
+            onRemove={(id) => { map.removeNode(id); setSelectedNodeId(null); }}
           />
         ))}
       </div>
     </>
   );
-}
+});

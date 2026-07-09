@@ -21,7 +21,18 @@ export function AppProvider({ children }) {
   const [notebooks, setNotebooks]               = useState([]);
   const [pages, setPages]                       = useState({});
   const [zoom, setZoom]                         = useState(1);
-  const [saveStatus, setSaveStatus]             = useState('idle'); // 'idle'|'saving'|'saved'|'error'
+  const [saveStatus, setSaveStatus]             = useState('idle');
+
+  // Text-box formatting — shared across Toolbar controls and TextBoxElement
+  const [fontFamily,    setFontFamily]    = useState('Arial');
+  const [fontSize,      setFontSize]      = useState(16);
+  const [textBold,      setTextBold]      = useState(false);
+  const [textItalic,    setTextItalic]    = useState(false);
+  const [textUnderline, setTextUnderline] = useState(false);
+
+  // Which text-box element is currently "active" (last focused / being edited)
+  // Persists even after DOM blur so toolbar changes still apply to it
+  const [activeTextElementId, setActiveTextElementId] = useState(null);
 
   return (
     <AppContext.Provider value={{
@@ -35,6 +46,12 @@ export function AppProvider({ children }) {
       pages,            setPages,
       zoom,             setZoom,
       saveStatus,       setSaveStatus,
+      fontFamily,    setFontFamily,
+      fontSize,      setFontSize,
+      textBold,      setTextBold,
+      textItalic,    setTextItalic,
+      textUnderline, setTextUnderline,
+      activeTextElementId, setActiveTextElementId,
     }}>
       {children}
     </AppContext.Provider>

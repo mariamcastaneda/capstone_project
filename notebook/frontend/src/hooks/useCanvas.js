@@ -7,7 +7,7 @@ const CANVAS_H = 3000;
  * Core drawing hook for the HTML5 canvas.
  * Manages strokes, eraser (stroke-level + pixel-level), RAF redraw, and pan/zoom.
  */
-export default function useCanvas({ canvasRef, color, strokeWidth, tool, eraserMode, onStrokeComplete }) {
+export default function useCanvas({ canvasRef, color, strokeWidth, tool, eraserMode, onStrokeComplete, onStrokeErased }) {
   const strokesRef   = useRef([]); // [{ tool, color, width, points: [[x,y]...] }]
   const currentRef   = useRef(null);
   const isDrawingRef = useRef(false);
@@ -69,16 +69,28 @@ export default function useCanvas({ canvasRef, color, strokeWidth, tool, eraserM
   const eraseAtPoint = useCallback(([px, py]) => {
     const RADIUS = strokeWidth * 5;
     if (eraserMode === 'stroke') {
+      // Collect DB element IDs of strokes that will be removed
+      const erasedIds = strokesRef.current
+        .filter(s => s.points.some(([x, y]) => Math.hypot(x - px, y - py) < RADIUS))
+        .map(s => s._elementId)
+        .filter(Boolean);
+
       strokesRef.current = strokesRef.current.filter(s =>
         !s.points.some(([x, y]) => Math.hypot(x - px, y - py) < RADIUS));
+
+      erasedIds.forEach(id => onStrokeErased?.(id));
     } else {
       // pixel-level: trim points from each stroke within radius
       strokesRef.current = strokesRef.current.map(s => ({
         ...s, points: s.points.filter(([x, y]) => Math.hypot(x - px, y - py) >= RADIUS),
-      })).filter(s => s.points.length > 1);
+      }));
+      // If any stroke is now empty, report its ID as erased
+      const fullyErased = strokesRef.current.filter(s => !s.points.length);
+      fullyErased.forEach(s => s._elementId && onStrokeErased?.(s._elementId));
+      strokesRef.current = strokesRef.current.filter(s => s.points.length > 1);
     }
     scheduleRedraw();
-  }, [eraserMode, strokeWidth, scheduleRedraw]);
+  }, [eraserMode, strokeWidth, scheduleRedraw, onStrokeErased]);
 
   // ── Event handlers ─────────────────────────────────────────────────────────
   const onPointerDown = useCallback((e) => {
